@@ -249,17 +249,8 @@ namespace DynamicFlight
                 }
             }
 
-            // Ragdoll Implementation
-            if (_isFlying)
-            {
-                var rm = Player.RigManager;
-                bool ragdolled = rm.physicsRig.torso.shutdown || !rm.physicsRig.ballLocoEnabled;
-                
-                if (ragdolled)
-                {
-                    StopFlying();
-                }
-            }
+            
+
             if (_isFlying && _prefFlipsEnabled.Value && _headTrackingInit)
             {
                 ProcessForSpins();
@@ -268,22 +259,21 @@ namespace DynamicFlight
 
         private void ProcessForSpins()
         {
-            Transform head = Player.Head;
-            if (head == null) return;
+            float pitchInput = 0f;
+            float rollInput = 0f;
+            Vector2 rightStick = Player.RightController.GetThumbStickAxis();
 
-            Quaternion relativeRotation = Quaternion.Inverse(_initialHeadRotation) * head.rotation;
-            Vector3 eulerAngles = relativeRotation.eulerAngles;
+            if (rightStick.y > 0.05f) pitchInput += rightStick.y;
+            if (rightStick.x > 0.05f) rollInput += rightStick.x;
             
-            float rawRoll = eulerAngles.z;
-            float rawPitch = eulerAngles.x;
-
-            if (rawRoll > 180f) rawRoll -= 360f;
-            if (rawPitch > 180f) rawPitch -= 360f;
-            
-            Vector2 stickAxis = Player.RightController.GetThumbStickAxis();
-            float spinSpeed = _prefSpinSpeed.Value;
-            rawPitch += stickAxis.y * spinSpeed;
-            rawRoll += stickAxis.x * spinSpeed;
+            if (Mathf.Abs(pitchInput) > 0.1f)
+            {
+                _currentPitch += pitchInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
+            }
+            if (Mathf.Abs(rollInput) > 0.1f)
+            {
+                _currentRoll += rollInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
+            }
         }
         private float EaseInOutCubic(float t)
         {
@@ -489,7 +479,7 @@ namespace DynamicFlight
 
             Notifier.Send(new Notification
                 {
-                    Title = "Dynamic Flight",
+                    Title = "Flight",
                     Message = "ON",
                     ShowTitleOnPopup = true,
                     PopupLength = 1.5f,
@@ -499,7 +489,7 @@ namespace DynamicFlight
 
         private void StopFlying()
         {
-            _isFlying = true;
+            _isFlying = false;
             _currentSpeedMultiplier = 1f;
             _isSpeedBoosted = false;
             _speedBuildUp = 0f;
@@ -512,7 +502,7 @@ namespace DynamicFlight
 
             Notifier.Send(new Notification
                 {
-                    Title = "Dynamic Flight",
+                    Title = "Flight",
                     Message = "OFF",
                     ShowTitleOnPopup = true,
                     PopupLength = 1.5f,
