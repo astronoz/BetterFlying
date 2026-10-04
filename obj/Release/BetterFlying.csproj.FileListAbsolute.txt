@@ -28,3 +28,14 @@
 /home/jack/Documents/BetterFlying/obj/Release/refint/DynamicFlight.dll
 /home/jack/Documents/BetterFlying/obj/Release/DynamicFlight.pdb
 /home/jack/Documents/BetterFlying/obj/Release/ref/DynamicFlight.dll
+/home/jack/Documents/GitHub/BetterFlying/bin/DynamicFlight.deps.json
+/home/jack/Documents/GitHub/BetterFlying/bin/DynamicFlight.dll
+/home/jack/Documents/GitHub/BetterFlying/bin/DynamicFlight.pdb
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/BetterFlying.csproj.AssemblyReference.cache
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/BetterFlying.GeneratedMSBuildEditorConfig.editorconfig
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/BetterFlying.csproj.CoreCompileInputs.cache
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/BetterFlying.sourcelink.json
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/DynamicFlight.dll
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/refint/DynamicFlight.dll
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/DynamicFlight.pdb
+/home/jack/Documents/GitHub/BetterFlying/obj/Release/ref/DynamicFlight.dll

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yNn2RcHR/DovfL9CbEbEAryBTgtcy9nYlLUGivt8A49rCTaxoext7hr+BQqENhmfD6eAKA44ukhXZwU/XJiB9Q==",
+  "dgSpecHash": "77MxRDWEbe5XGprx6T5ldCBlkDp1QMbPKw5by18ZlHoUpd14WrT5v80AYUgbvWdgaTjFk4zglvFqbmLYvxjt2A==",
   "success": true,
-  "projectFilePath": "/home/jack/Documents/BetterFlying/BetterFlying.csproj",
+  "projectFilePath": "/home/jack/Documents/GitHub/BetterFlying/BetterFlying.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

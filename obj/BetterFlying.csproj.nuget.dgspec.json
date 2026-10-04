@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/jack/Documents/BetterFlying/BetterFlying.csproj": {}
+    "/home/jack/Documents/GitHub/BetterFlying/BetterFlying.csproj": {}
   },
   "projects": {
-    "/home/jack/Documents/BetterFlying/BetterFlying.csproj": {
+    "/home/jack/Documents/GitHub/BetterFlying/BetterFlying.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/jack/Documents/BetterFlying/BetterFlying.csproj",
+        "projectUniqueName": "/home/jack/Documents/GitHub/BetterFlying/BetterFlying.csproj",
         "projectName": "DynamicFlight",
-        "projectPath": "/home/jack/Documents/BetterFlying/BetterFlying.csproj",
+        "projectPath": "/home/jack/Documents/GitHub/BetterFlying/BetterFlying.csproj",
         "packagesPath": "/home/jack/.nuget/packages/",
-        "outputPath": "/home/jack/Documents/BetterFlying/obj/",
+        "outputPath": "/home/jack/Documents/GitHub/BetterFlying/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/jack/.nuget/NuGet/NuGet.Config"
