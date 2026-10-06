@@ -33,6 +33,7 @@ namespace DynamicFlight
         private bool _isFlying = false;
         private Vector3 _currentVelocity = Vector3.zero;
         private float _lastBPressTime = 0f;
+        private float _lastAPressTime = 0f;
         private float _doubleTapDelay = 0.35f;
 
         // Speed Multiplyer State
@@ -145,8 +146,9 @@ namespace DynamicFlight
             }));
 
             // Spin Speed
-            page.CreateFloat("Spin Speed", Color.yellow, _prefSpinSpeed.Value, 1f, 1f, 10f, (Action<float>)(val =>
+            page.CreateFloat("Spin Speed", Color.yellow, _prefSpinSpeed.Value, 1f, 1f, 20f, (Action<float>)(val =>
             {
+                val = Mathf.Round(val * -10f);
                 _prefSpinSpeed.Value = val;
                 _prefCat.SaveToFile(true);
             }));
@@ -159,6 +161,16 @@ namespace DynamicFlight
 
         public override void OnUpdate()
         {
+            // Update Speed Boost Cooldown Timer
+            if (_speedBoostCooldown)
+            {
+                _speedBoostCooldownTimer -= Time.unscaledDeltaTime;
+                if (_speedBoostCooldownTimer <= 0f)
+                {
+                    _speedBoostCooldown = false;
+                }
+            }
+            
             if (!_hasHeadRefInit && Player.HandsExist)
             {
                 Transform head = Player.Head;
@@ -184,6 +196,20 @@ namespace DynamicFlight
                 else
                 {
                     _lastBPressTime = now;
+                }
+            }
+
+            if (Player.RightController.GetAButtonDown())
+            {
+                float now = Time.unscaledTime;
+                if (now - _lastAPressTime <= _doubleTapDelay)
+                {
+                    if (_isFlying) ResetCameraRotation();
+                    _lastAPressTime = 0f;
+                }
+                else
+                {
+                    _lastAPressTime = now;
                 }
             }
 
@@ -249,9 +275,21 @@ namespace DynamicFlight
                 }
             }
 
+            // Ragdoll Implementation
+            if (_isFlying)
+            {
+                var rm = Player.RigManager;
+                bool ragdolled = rm.physicsRig.torso.shutdown || !rm.physicsRig.ballLocoEnabled;
+                if (ragdolled)
+                {
+                    StopFlying();
+                }
+
+            }
+
             
 
-            if (_isFlying && _prefFlipsEnabled.Value && _headTrackingInit)
+            if (_isFlying && _prefFlipsEnabled.Value && _headTrackingInit && Player.RightController.GetAButton())
             {
                 ProcessForSpins();
             }
@@ -261,23 +299,35 @@ namespace DynamicFlight
         {
             float pitchInput = 0f;
             float rollInput = 0f;
-            Vector2 rightStick = Player.RightController.GetThumbStickAxis();
-
-            if (rightStick.y > 0.05f) pitchInput += rightStick.y;
-            if (rightStick.x > 0.05f) rollInput += rightStick.x;
-            
-            if (Mathf.Abs(pitchInput) > 0.1f)
-            {
-                _currentPitch += pitchInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
-            }
+            float rightGrip = GetGripValue(XRNode.RightHand);
+            float leftGrip = GetGripValue(XRNode.LeftHand);
+            float rightTrigger = GetTriggerValue(XRNode.RightHand);
+            float leftTrigger = GetTriggerValue(XRNode.LeftHand);
+                
+            if (Mathf.Abs(rightGrip) > 0.05f) rollInput -= rightGrip;
+            if (Mathf.Abs(leftGrip) > 0.05f) rollInput += leftGrip;    
             if (Mathf.Abs(rollInput) > 0.1f)
             {
                 _currentRoll += rollInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
             }
-        }
-        private float EaseInOutCubic(float t)
-        {
-            return t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+
+            if (Mathf.Abs(rightTrigger) > 0.05f) pitchInput -= rightTrigger;
+            if (Mathf.Abs(leftTrigger) > 0.05f) pitchInput += leftTrigger;
+            if (Mathf.Abs(pitchInput) > 0.1f)
+            {
+                _currentPitch += pitchInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
+            }
+
+            if (rightTrigger == leftTrigger)
+            {
+                _currentPitch += 0f;
+            }
+
+            if (rightGrip == leftGrip)
+            {
+                _currentRoll += 0f;
+            }
+            
         }
         private bool GetTriggerPressed(XRNode node)
         {
@@ -287,6 +337,24 @@ namespace DynamicFlight
                 return triggerValue > 0.5f;
             }
             return false;
+        }
+        private float GetTriggerValue(XRNode node)
+        {
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (device.isValid && device.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue))
+            {
+                return triggerValue;
+            }
+            return 0;
+        }
+        private float GetGripValue(XRNode node)
+        {
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (device.isValid && device.TryGetFeatureValue(CommonUsages.grip, out float gripValue))
+            {
+                return gripValue;
+            }
+            return 0;
         }
 
         public override void OnFixedUpdate()
@@ -315,11 +383,10 @@ namespace DynamicFlight
             targetVelocity += Vector3.up * rightStick.y * currentVerticalSpeed;
 
             _currentVelocity = Vector3.Lerp(_currentVelocity, targetVelocity, Time.fixedDeltaTime * Damping * 2f);
-            _smoothedVelocity = Vector3.Lerp(_smoothedVelocity, _currentVelocity, Time.fixedDeltaTime * 10f);
 
             Rigidbody[] bodyParts = GetAllBodyRigidbodies(physicsRig);
 
-            Vector3 finalVelocity = _smoothedVelocity;
+            Vector3 finalVelocity = _currentVelocity;
             
             foreach (Rigidbody rb in bodyParts)
             {
@@ -438,7 +505,7 @@ namespace DynamicFlight
                 AddIfNotNull(list, physRig.softbody.rbArmUpperRt);
                 AddIfNotNull(list, physRig.softbody.rbForearmLf);
                 AddIfNotNull(list, physRig.softbody.rbForearmRt);
-                AddIfNotNull(list, physRig.softbody.rbSoftHandLf);                AddIfNotNull(list, physRig.softbody.rbSoftHandLf);
+                AddIfNotNull(list, physRig.softbody.rbSoftHandLf);
                 AddIfNotNull(list, physRig.softbody.rbSoftHandRt);
             }
 
