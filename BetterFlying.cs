@@ -148,7 +148,6 @@ namespace DynamicFlight
             // Spin Speed
             page.CreateFloat("Spin Speed", Color.yellow, _prefSpinSpeed.Value, 1f, 1f, 20f, (Action<float>)(val =>
             {
-                val = Mathf.Round(val * -10f);
                 _prefSpinSpeed.Value = val;
                 _prefCat.SaveToFile(true);
             }));
@@ -308,14 +307,14 @@ namespace DynamicFlight
             if (Mathf.Abs(leftGrip) > 0.05f) rollInput += leftGrip;    
             if (Mathf.Abs(rollInput) > 0.1f)
             {
-                _currentRoll += rollInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
+                _currentRoll += rollInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime * 30;
             }
 
             if (Mathf.Abs(rightTrigger) > 0.05f) pitchInput -= rightTrigger;
             if (Mathf.Abs(leftTrigger) > 0.05f) pitchInput += leftTrigger;
             if (Mathf.Abs(pitchInput) > 0.1f)
             {
-                _currentPitch += pitchInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime;
+                _currentPitch += pitchInput * _prefSpinSpeed.Value * Time.unscaledDeltaTime * 30;
             }
 
             if (rightTrigger == leftTrigger)
@@ -364,7 +363,17 @@ namespace DynamicFlight
             PhysicsRig physicsRig = Player.PhysicsRig;
             if (physicsRig == null) return;
 
+            var rm = Player.RigManager;
+            if (rm == null) return;
+
+            var openControllerRig = rm.controllerRig.TryCast<OpenControllerRig>();
+            if (openControllerRig == null) return;
+
+            Quaternion visualRotation = Quaternion.Inverse(Quaternion.AngleAxis(_currentRoll, Vector3.forward) * Quaternion.AngleAxis(_currentPitch, Vector3.right));
+            
+
             Transform head = Player.Head;
+            Transform playspace = openControllerRig.transform;
             Vector3 forward = head.forward;
             Vector3 right = head.right;
 
@@ -422,6 +431,8 @@ namespace DynamicFlight
             Transform playspace = openControllerRig.transform;
             Transform playspaceHead = openControllerRig.m_head.transform;
             Transform physicsHead = rm.physicsRig.m_head;
+
+            // Quaternion visualRotation = Quaternion.Inverse(Quaternion.AngleAxis(_currentRoll, Vector3.forward) * Quaternion.AngleAxis(_currentPitch, Vector3.right));
 
             if (Mathf.Abs(_currentRoll) > 0.01f || Mathf.Abs(_currentPitch) > 0.01f)
             {

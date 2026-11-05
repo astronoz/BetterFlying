@@ -1,0 +1,10 @@
+{
+  "name": "DynamicFlight",
+  "version_number": "1.2.0",
+  "website_url": "https://github.com/astronoz/BetterFlying/tree/main",
+  "description": "A flight mod for BONELAB. Allows for flying with your head.",
+  "dependencies": [
+    "LavaGang-MelonLoader-0.6.5",
+    "bonelib-BoneLib-3.2.1"
+  ]
+}
