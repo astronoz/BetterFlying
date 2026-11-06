@@ -14,3 +14,6 @@
 - **Boost Mode:** Boost Mode multiplies your flight speed making you go insanely fast (Can crash your game if going too fast).
 - **Ragdoll:** Not nessicary but if you have Ragdoll by Lakatrazz installed you can quickly stop flight by ragdolling.
 - **Flips:** The camera can be rotated to let you spin (Can cause motion sickness).
+
+
+## If you experience ANY bugs please report it in the issues page on Github alongside how you are playing BONELAB, I have only tested this on my standalone quest
