@@ -1,4 +1,4 @@
-# BetterFlying
+# DynamicFlight
  
 ## Controls
 - **B Button:** Toggle Flight on/off. Double click right thumbstick to noclip.
